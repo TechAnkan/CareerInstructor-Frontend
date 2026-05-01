@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 // Create an Axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: `${API_BASE_URL}/api`,
   withCredentials: true, // This is crucial for sending/receiving the HTTP-only refresh token cookie
 });
 
@@ -30,7 +32,7 @@ api.interceptors.response.use(
       try {
         // Attempt to get a new access token using the HTTP-only refresh token
         const res = await axios.post(
-          'http://localhost:5000/api/auth/refresh-token',
+          `${API_BASE_URL}/api/auth/refresh-token`,
           {},
           { withCredentials: true }
         );
