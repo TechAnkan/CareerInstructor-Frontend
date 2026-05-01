@@ -11,28 +11,28 @@ import { ArrowLeft, BookOpen, Compass, Search, X, CheckCircle2, ChevronRight } f
 import { motion, AnimatePresence } from "framer-motion";
 import api from "@/lib/api";
 
-// Sample career nodes
+// Sample career nodes covering all streams
 const careerNodes = [
-  { 
-    id: 1, position: [0, 0, 0], title: "Software Engineering", color: "#6366f1", desc: "Build apps, systems, and platforms.",
-    steps: ["Learn HTML, CSS, JavaScript", "Master React & Next.js", "Understand Node.js & Databases", "Build Full-Stack Projects", "Ace Algorithms & Data Structures"]
-  },
-  { 
-    id: 2, position: [3, 2, -2], title: "Data Science", color: "#a855f7", desc: "Analyze data to find hidden patterns.",
-    steps: ["Learn Python & SQL", "Master Statistics & Probability", "Learn Pandas & NumPy", "Machine Learning Basics", "Build Predictive Models"]
-  },
-  { 
-    id: 3, position: [-3, -1, -4], title: "UX/UI Design", color: "#ec4899", desc: "Design beautiful user experiences.",
-    steps: ["Learn Design Principles", "Master Figma", "Understand User Research", "Create Wireframes & Prototypes", "Build a Design Portfolio"]
-  },
-  { 
-    id: 4, position: [2, -3, 2], title: "Cybersecurity", color: "#14b8a6", desc: "Protect networks and systems from threats.",
-    steps: ["Learn Networking Basics", "Master Linux & Shell", "Understand Cryptography", "Learn Ethical Hacking", "Get Security+ Certified"]
-  },
-  { 
-    id: 5, position: [-4, 2, 3], title: "Cloud Computing", color: "#3b82f6", desc: "Manage scalable cloud infrastructures.",
-    steps: ["Understand Networking & OS", "Learn AWS/Azure Basics", "Master Docker & Containers", "Learn Kubernetes", "Deploy Scalable Apps"]
-  },
+  // Engineering & Tech
+  { id: 1, position: [0, 0, 0], title: "Software Engineering", color: "#6366f1", desc: "Build apps, systems, and platforms.", steps: ["Learn HTML, CSS, JavaScript", "Master React & Next.js", "Understand Node.js & Databases", "Build Full-Stack Projects", "Ace Algorithms & Data Structures"] },
+  { id: 2, position: [3, 2, -2], title: "Data Science", color: "#a855f7", desc: "Analyze data to find hidden patterns.", steps: ["Learn Python & SQL", "Master Statistics & Probability", "Learn Pandas & NumPy", "Machine Learning Basics", "Build Predictive Models"] },
+  
+  // Medical & Healthcare
+  { id: 3, position: [5, -1, 3], title: "Medicine & Surgery", color: "#ef4444", desc: "Diagnose and treat patients as a doctor.", steps: ["Clear NEET/Medical Entrance", "Complete MBBS Degree", "1-Year Internship", "Pursue MD/MS Specialization", "Obtain Medical License"] },
+  { id: 4, position: [7, 1, 1], title: "Biotechnology", color: "#14b8a6", desc: "Merge biology with technology for innovation.", steps: ["Study Biology & Chemistry", "B.Sc/B.Tech in Biotech", "Learn Lab Techniques", "Master Bioinformatics", "Pursue R&D or Pharma Roles"] },
+
+  // Commerce & Business
+  { id: 5, position: [-4, 3, 0], title: "Chartered Accountancy", color: "#10b981", desc: "Manage finances, auditing, and taxation.", steps: ["Clear CA Foundation", "Complete CA Intermediate", "3 Years Articleship", "Clear CA Final", "Register with ICAI"] },
+  { id: 6, position: [-6, 1, -2], title: "Investment Banking", color: "#059669", desc: "Help organizations raise capital and grow.", steps: ["Degree in Finance/Economics", "Learn Financial Modeling", "MBA from Top Tier College", "Intern at a Bank", "Network & Pass Licensing Exams"] },
+
+  // Arts & Humanities
+  { id: 7, position: [0, 4, 4], title: "Journalism", color: "#f97316", desc: "Investigate and report news to the public.", steps: ["Degree in Mass Communication", "Build Strong Writing Skills", "Start a Blog/Portfolio", "Intern at a News Agency", "Specialize in a Beat"] },
+  { id: 8, position: [2, 5, 2], title: "Psychology", color: "#db2777", desc: "Study the human mind and behavior.", steps: ["BA/B.Sc in Psychology", "MA/M.Sc Specialization", "Clear NET/Licensing", "Complete Clinical Internships", "Start Practice or Research"] },
+  { id: 9, position: [-5, -2, 3], title: "Law & Legal Studies", color: "#64748b", desc: "Advocate for justice and interpret laws.", steps: ["Clear CLAT/Law Entrance", "Complete LLB Degree", "Intern with a Senior Lawyer", "Pass Bar Council Exam", "Specialize in Corporate/Criminal Law"] },
+
+  // Pure Sciences / Honors
+  { id: 10, position: [1, -5, -2], title: "Physics Research", color: "#0ea5e9", desc: "Uncover the fundamental laws of the universe.", steps: ["B.Sc Honors in Physics", "Master Calculus & Math", "M.Sc in Physics", "Qualify CSIR-NET/GATE", "Pursue Ph.D in specific field"] },
+  { id: 11, position: [-3, -4, -1], title: "Architecture", color: "#eab308", desc: "Design buildings and physical structures.", steps: ["Clear NATA/JEE Paper 2", "Complete B.Arch Degree", "Master AutoCAD & 3D Modeling", "Complete Mandatory Internship", "Register with Council of Architecture"] },
 ];
 
 function CareerNode({ id, position, title, color, desc, onSelect }: any) {
@@ -91,17 +91,21 @@ function CareerNode({ id, position, title, color, desc, onSelect }: any) {
 
 // Draw lines between nodes to represent paths
 function Connections() {
-  const points1 = [careerNodes[0].position, careerNodes[1].position] as any;
-  const points2 = [careerNodes[0].position, careerNodes[4].position] as any;
-  const points3 = [careerNodes[0].position, careerNodes[3].position] as any;
-  const points4 = [careerNodes[0].position, careerNodes[2].position] as any;
+  const lines = [
+    [careerNodes[0].position, careerNodes[1].position], // SE -> Data
+    [careerNodes[2].position, careerNodes[3].position], // Med -> Biotech
+    [careerNodes[4].position, careerNodes[5].position], // CA -> IB
+    [careerNodes[6].position, careerNodes[7].position], // Journalism -> Psych
+    [careerNodes[1].position, careerNodes[9].position], // Data -> Physics
+    [careerNodes[0].position, careerNodes[10].position], // SE -> Arch
+    [careerNodes[8].position, careerNodes[5].position], // Law -> IB
+  ] as any;
 
   return (
     <>
-      <Line points={points1} color="white" opacity={0.1} transparent lineWidth={1} />
-      <Line points={points2} color="white" opacity={0.1} transparent lineWidth={1} />
-      <Line points={points3} color="white" opacity={0.1} transparent lineWidth={1} />
-      <Line points={points4} color="white" opacity={0.1} transparent lineWidth={1} />
+      {lines.map((points: any, i: number) => (
+        <Line key={i} points={points} color="white" opacity={0.15} transparent lineWidth={1} />
+      ))}
     </>
   );
 }
@@ -109,7 +113,53 @@ function Connections() {
 export default function Explore() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [selectedPath, setSelectedPath] = useState<number | null>(null);
+  const [selectedNode, setSelectedNode] = useState<any | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
+  const [subtopicsCache, setSubtopicsCache] = useState<Record<string, string[]>>({});
+  const [loadingSubtopics, setLoadingSubtopics] = useState<boolean>(false);
+
+  const handleExpandStep = async (stepTitle: string, index: number) => {
+    if (expandedStep === index) {
+      setExpandedStep(null);
+      return;
+    }
+    setExpandedStep(index);
+    const cacheKey = `${selectedNode.title}-${stepTitle}`;
+    if (subtopicsCache[cacheKey]) return; // Already fetched
+
+    setLoadingSubtopics(true);
+    try {
+      const { data } = await api.post('/ai/subtopics', { careerTitle: selectedNode.title, stepTitle });
+      setSubtopicsCache(prev => ({ ...prev, [cacheKey]: data }));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingSubtopics(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim() || isGenerating) return;
+    setIsGenerating(true);
+    try {
+      const { data } = await api.post('/ai/generate-roadmap', { career: searchQuery });
+      setSelectedNode({
+        id: 'custom-' + Date.now(),
+        title: data.title,
+        desc: data.desc,
+        color: data.color || '#8b5cf6',
+        steps: data.steps
+      });
+      setSearchQuery("");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to generate roadmap.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -118,8 +168,6 @@ export default function Explore() {
   }, [user, loading, router]);
 
   if (loading || !user) return <div className="min-h-screen bg-black" />;
-
-  const selectedNode = selectedPath ? careerNodes.find(n => n.id === selectedPath) : null;
 
   return (
     <div className="h-screen w-full bg-black relative font-sans overflow-hidden">
@@ -143,10 +191,21 @@ export default function Explore() {
             <div className="relative">
               <input 
                 type="text" 
-                placeholder="Search careers..." 
-                className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-4 pr-10 text-white focus:outline-none focus:border-purple-500 transition-colors text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSearch();
+                }}
+                placeholder="Search careers... (Press Enter)" 
+                className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-4 pr-10 text-white focus:outline-none focus:border-purple-500 transition-colors text-sm disabled:opacity-50"
+                disabled={isGenerating}
               />
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+              {isGenerating && (
+                <div className="absolute right-10 top-1/2 -translate-y-1/2 text-xs text-purple-400 animate-pulse font-medium">
+                  Generating...
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
@@ -163,7 +222,7 @@ export default function Explore() {
             {careerNodes.slice(0, 3).map(node => (
               <button 
                 key={node.id} 
-                onClick={() => setSelectedPath(node.id)}
+                onClick={() => setSelectedNode(careerNodes.find(n => n.id === node.id))}
                 className="text-left text-sm text-zinc-400 hover:text-white hover:bg-white/5 px-3 py-2 rounded-lg transition-colors flex items-center gap-2"
               >
                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: node.color }}></span>
@@ -182,7 +241,7 @@ export default function Explore() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSelectedPath(null)}
+            onClick={() => setSelectedNode(null)}
             className="absolute inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm pointer-events-auto"
           >
             <motion.div 
@@ -202,7 +261,7 @@ export default function Explore() {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setSelectedPath(null);
+                  setSelectedNode(null);
                 }}
                 className="absolute top-6 right-6 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-[100] cursor-pointer"
               >
@@ -230,9 +289,40 @@ export default function Explore() {
                         )}
                       </div>
                       <div className="flex-1 pb-6 pt-1">
-                        <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between group-hover:bg-white/10 transition-colors">
-                          <span className="text-zinc-300 font-medium">{step}</span>
-                          <ChevronRight className="w-5 h-5 text-zinc-600 group-hover:text-white transition-colors" />
+                        <div 
+                          onClick={() => handleExpandStep(step, index)}
+                          className="bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col group-hover:bg-white/10 transition-colors cursor-pointer"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-zinc-300 font-medium">{step}</span>
+                            <ChevronRight className={`w-5 h-5 text-zinc-600 group-hover:text-white transition-all ${expandedStep === index ? 'rotate-90' : ''}`} />
+                          </div>
+                          
+                          <AnimatePresence>
+                            {expandedStep === index && (
+                              <motion.div 
+                                initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                                animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
+                                exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                                className="overflow-hidden"
+                              >
+                                {loadingSubtopics && !subtopicsCache[`${selectedNode.title}-${step}`] ? (
+                                  <div className="text-sm text-purple-400 animate-pulse flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full border-2 border-purple-400 border-t-transparent animate-spin" />
+                                    AI is analyzing sub-topics...
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-wrap gap-2">
+                                    {subtopicsCache[`${selectedNode.title}-${step}`]?.map((subtopic, i) => (
+                                      <span key={i} className="text-sm bg-indigo-500/20 text-indigo-300 px-3 py-1.5 rounded-xl border border-indigo-500/30">
+                                        {subtopic}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                       </div>
                     </div>
@@ -292,7 +382,7 @@ export default function Explore() {
         <Connections />
 
         {careerNodes.map((node) => (
-          <CareerNode key={node.id} {...node} onSelect={setSelectedPath} />
+          <CareerNode key={node.id} {...node} onSelect={(id: any) => setSelectedNode(careerNodes.find(n => n.id === id))} />
         ))}
 
         <OrbitControls 

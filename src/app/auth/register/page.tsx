@@ -9,6 +9,9 @@ import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
 export default function Register() {
+  const [name, setName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -25,7 +28,7 @@ export default function Register() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.post("/auth/register", { email, password });
+      const res = await api.post("/auth/register", { name, mobile, address, email, password });
       setMsg(res.data.message + (res.data.previewUrl ? ` (Check console for ethereal email URL)` : ""));
       console.log("OTP Email URL:", res.data.previewUrl);
       setStep(2);
@@ -70,6 +73,36 @@ export default function Register() {
 
         {step === 1 ? (
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-1">Full Name</label>
+              <input 
+                type="text" 
+                required 
+                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors"
+                value={name}
+                onChange={e => setName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-1">Mobile Number</label>
+              <input 
+                type="tel" 
+                required 
+                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors"
+                value={mobile}
+                onChange={e => setMobile(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-1">Address</label>
+              <input 
+                type="text" 
+                required 
+                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors"
+                value={address}
+                onChange={e => setAddress(e.target.value)}
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-1">Email Address</label>
               <input 

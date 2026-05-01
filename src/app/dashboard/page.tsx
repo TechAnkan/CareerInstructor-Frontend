@@ -3,9 +3,9 @@
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Compass, Flame, Star, Trophy, Plus } from "lucide-react";
+import { ArrowRight, BookOpen, Compass, Flame, Star, Trophy, Plus, User as UserIcon, ChevronRight } from "lucide-react";
 import api from "@/lib/api";
 
 export default function Dashboard() {
@@ -13,6 +13,31 @@ export default function Dashboard() {
   const router = useRouter();
   const [roadmaps, setRoadmaps] = useState<any[]>([]);
   const [loadingRoadmaps, setLoadingRoadmaps] = useState(true);
+  const [gamification, setGamification] = useState<any>(null);
+  const [loadingGamification, setLoadingGamification] = useState(true);
+  const [expandedStep, setExpandedStep] = useState<string | null>(null);
+  const [subtopicsCache, setSubtopicsCache] = useState<Record<string, string[]>>({});
+  const [loadingSubtopics, setLoadingSubtopics] = useState<boolean>(false);
+
+  const handleExpandStep = async (careerTitle: string, stepTitle: string, stepId: string) => {
+    if (expandedStep === stepId) {
+      setExpandedStep(null);
+      return;
+    }
+    setExpandedStep(stepId);
+    const cacheKey = `${careerTitle}-${stepTitle}`;
+    if (subtopicsCache[cacheKey]) return; // Already fetched
+
+    setLoadingSubtopics(true);
+    try {
+      const { data } = await api.post('/ai/subtopics', { careerTitle, stepTitle });
+      setSubtopicsCache(prev => ({ ...prev, [cacheKey]: data }));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingSubtopics(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -33,7 +58,20 @@ export default function Dashboard() {
         setLoadingRoadmaps(false);
       }
     };
+    const fetchGamification = async () => {
+      try {
+        if (user) {
+          const { data } = await api.get('/gamification');
+          setGamification(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch gamification", error);
+      } finally {
+        setLoadingGamification(false);
+      }
+    };
     fetchRoadmaps();
+    fetchGamification();
   }, [user]);
 
   const toggleStep = async (roadmapId: string, stepId: string) => {
@@ -82,9 +120,37 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans p-6 md:p-12 overflow-hidden relative">
-      {/* Background elements */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* Animated Background elements */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none z-0" />
+      
+      <motion.div 
+        animate={{ 
+          x: [0, 100, 0, -100, 0],
+          y: [0, 50, 0, -50, 0],
+          scale: [1, 1.2, 1],
+        }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        className="absolute -top-40 -right-40 w-[800px] h-[800px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none z-0" 
+      />
+      
+      <motion.div 
+        animate={{ 
+          x: [0, -100, 0, 100, 0],
+          y: [0, -50, 0, 50, 0],
+          scale: [1, 1.5, 1],
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        className="absolute -bottom-40 -left-40 w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none z-0" 
+      />
+
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.3, 1],
+          opacity: [0.1, 0.3, 0.1],
+        }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0" 
+      />
 
       <div className="max-w-6xl mx-auto relative z-10">
         <header className="flex justify-between items-center mb-12">
@@ -110,7 +176,10 @@ export default function Dashboard() {
           </div>
           <div className="hidden md:flex items-center gap-4 bg-white/5 border border-white/10 px-6 py-3 rounded-full backdrop-blur-md">
             <Flame className="w-5 h-5 text-orange-400" />
-            <span className="font-medium">3 Day Streak!</span>
+            <span className="font-medium mr-2">{gamification?.streak || 0} Day Streak!</span>
+            <Link href="/profile" className="flex items-center gap-2 hover:text-indigo-400 transition-colors border-l border-white/10 pl-4">
+              <UserIcon className="w-5 h-5" /> Profile
+            </Link>
           </div>
         </header>
 
@@ -189,23 +258,55 @@ export default function Dashboard() {
                     {roadmap.steps.map((step: any, i: number) => {
                       const isActive = i === firstUncompletedIndex;
                       return (
-                        <div 
-                          key={step._id} 
-                          onClick={() => toggleStep(roadmap._id, step._id)}
-                          className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-colors hover:bg-white/10
-                            ${isActive ? 'bg-white/10 border-white/30' : 'bg-black/20 border-white/5'}`}
-                        >
+                        <div key={step._id} className={`flex flex-col rounded-2xl border transition-colors hover:bg-white/10 ${isActive ? 'bg-white/10 border-white/30' : 'bg-black/20 border-white/5'}`}>
                           <div 
-                            className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors
-                              ${step.completed ? 'bg-green-500 border-green-500' : isActive ? 'border-white' : 'border-zinc-600'}`}
-                            style={isActive && !step.completed ? { borderColor: roadmap.color } : {}}
+                            className="flex items-center justify-between p-4 cursor-pointer"
+                            onClick={() => handleExpandStep(roadmap.careerTitle, step.title, step._id)}
                           >
-                            {step.completed && <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                            {isActive && !step.completed && <div className="w-2 h-2 rounded-full" style={{ backgroundColor: roadmap.color }} />}
+                            <div className="flex items-center gap-4 flex-1">
+                              <div 
+                                onClick={(e) => { e.stopPropagation(); toggleStep(roadmap._id, step._id); }}
+                                className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors flex-shrink-0 hover:scale-110
+                                  ${step.completed ? 'bg-green-500 border-green-500' : isActive ? 'border-white' : 'border-zinc-600'}`}
+                                style={isActive && !step.completed ? { borderColor: roadmap.color } : {}}
+                              >
+                                {step.completed && <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                                {isActive && !step.completed && <div className="w-2 h-2 rounded-full" style={{ backgroundColor: roadmap.color }} />}
+                              </div>
+                              <span className={`font-medium transition-colors ${step.completed ? 'text-zinc-500 line-through' : isActive ? 'text-white' : 'text-zinc-400'}`}>
+                                {step.title}
+                              </span>
+                            </div>
+                            <ChevronRight className={`w-5 h-5 text-zinc-500 transition-all ${expandedStep === step._id ? 'rotate-90' : ''}`} />
                           </div>
-                          <span className={`font-medium transition-colors ${step.completed ? 'text-zinc-500 line-through' : isActive ? 'text-white' : 'text-zinc-400'}`}>
-                            {step.title}
-                          </span>
+
+                          <AnimatePresence>
+                            {expandedStep === step._id && (
+                              <motion.div 
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden px-4"
+                              >
+                                <div className="pb-4 pt-2 border-t border-white/5 ml-10">
+                                  {loadingSubtopics && !subtopicsCache[`${roadmap.careerTitle}-${step.title}`] ? (
+                                    <div className="text-sm text-purple-400 animate-pulse flex items-center gap-2">
+                                      <div className="w-3 h-3 rounded-full border-2 border-purple-400 border-t-transparent animate-spin" />
+                                      AI is fetching subjects...
+                                    </div>
+                                  ) : (
+                                    <div className="flex flex-wrap gap-2">
+                                      {subtopicsCache[`${roadmap.careerTitle}-${step.title}`]?.map((subtopic, idx) => (
+                                        <span key={idx} className="text-xs bg-indigo-500/20 text-indigo-300 px-3 py-1.5 rounded-xl border border-indigo-500/30">
+                                          {subtopic}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                       );
                     })}
@@ -220,9 +321,20 @@ export default function Dashboard() {
             <motion.div variants={itemVariants} className="bg-gradient-to-br from-indigo-600 to-purple-700 p-8 rounded-3xl text-white relative overflow-hidden">
               <Trophy className="absolute -right-4 -bottom-4 w-32 h-32 text-white/10" />
               <h3 className="text-xl font-bold mb-2 relative z-10">Daily Challenge</h3>
-              <p className="text-white/80 text-sm mb-6 relative z-10">Read one article about emerging tech in your field of interest.</p>
-              <button className="bg-white text-indigo-900 px-4 py-2 rounded-full font-medium text-sm hover:bg-zinc-100 transition-colors relative z-10">
-                Complete Challenge
+              <p className="text-white/80 text-sm mb-6 relative z-10">
+                {gamification?.dailyChallenge?.text || "Read one article about emerging tech in your field of interest."}
+              </p>
+              <button 
+                onClick={async () => {
+                  try {
+                    await api.post('/gamification/complete');
+                    setGamification({ ...gamification, dailyChallenge: { ...gamification.dailyChallenge, isCompleted: true } });
+                  } catch (e) { console.error(e); }
+                }}
+                disabled={gamification?.dailyChallenge?.isCompleted}
+                className="bg-white disabled:bg-white/50 text-indigo-900 px-4 py-2 rounded-full font-medium text-sm hover:bg-zinc-100 disabled:hover:bg-white/50 transition-colors relative z-10 flex items-center gap-2 w-max"
+              >
+                {gamification?.dailyChallenge?.isCompleted ? <><svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg> Completed!</> : "Complete Challenge"}
               </button>
             </motion.div>
 
@@ -236,9 +348,16 @@ export default function Dashboard() {
                   "How to build a portfolio with zero experience",
                   "Understanding AI Ethics"
                 ].map((item, i) => (
-                  <Link key={i} href="#" className="text-sm text-zinc-400 hover:text-white hover:underline p-2 rounded-lg hover:bg-white/5 transition-all">
-                    {item}
-                  </Link>
+                  <a 
+                    key={i} 
+                    href={`https://www.google.com/search?q=${encodeURIComponent(item)}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-sm text-zinc-400 hover:text-white hover:underline p-2 rounded-lg hover:bg-white/5 transition-all flex items-center justify-between group"
+                  >
+                    <span>{item}</span>
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
                 ))}
               </div>
             </motion.div>

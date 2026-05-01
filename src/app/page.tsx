@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Canvas } from "@react-three/fiber";
+import { Stars } from "@react-three/drei";
 import Link from "next/link";
 import { ArrowRight, Bot, Compass, LineChart, PlayCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -10,10 +12,44 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans overflow-hidden">
-      {/* Background Gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-black to-purple-900/20 z-0" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[128px] z-0" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[128px] z-0" />
+      {/* Background Gradients & 3D Stars */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-950 to-black z-0" />
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none z-0" />
+      
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
+        <Canvas camera={{ position: [0, 0, 1] }}>
+          <Stars radius={50} depth={50} count={3000} factor={4} saturation={0} fade speed={1.5} />
+        </Canvas>
+      </div>
+      
+      <motion.div 
+        animate={{ 
+          x: [0, 150, 0, -150, 0],
+          y: [0, 100, 0, -100, 0],
+          scale: [1, 1.2, 1],
+        }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        className="absolute -top-40 -left-40 w-[800px] h-[800px] bg-indigo-600/20 rounded-full blur-[150px] pointer-events-none z-0" 
+      />
+      
+      <motion.div 
+        animate={{ 
+          x: [0, -150, 0, 150, 0],
+          y: [0, -100, 0, 100, 0],
+          scale: [1, 1.3, 1],
+        }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        className="absolute top-1/2 -right-40 w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[150px] pointer-events-none z-0" 
+      />
+
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.4, 1],
+          opacity: [0.1, 0.4, 0.1],
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[120px] pointer-events-none z-0" 
+      />
 
       {/* Navigation */}
       <nav className="relative z-10 flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
