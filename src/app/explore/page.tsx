@@ -278,7 +278,7 @@ export default function Explore() {
                 <h3 className="text-xl font-semibold text-white mb-4">Your Roadmap</h3>
                 
                 <div className="space-y-4">
-                  {selectedNode.steps?.map((step, index) => (
+                  {selectedNode.steps?.map((step: any, index: number) => (
                     <div key={index} className="flex gap-4 group">
                       <div className="flex flex-col items-center">
                         <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500 group-hover:bg-white/10 group-hover:text-white transition-colors">
