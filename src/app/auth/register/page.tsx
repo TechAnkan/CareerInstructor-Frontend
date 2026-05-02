@@ -14,8 +14,6 @@ export default function Register() {
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
@@ -28,27 +26,39 @@ export default function Register() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.post("/auth/register", { name, mobile, address, email, password });
-      setMsg(res.data.message + (res.data.previewUrl ? ` (Check console for ethereal email URL)` : ""));
-      console.log("OTP Email URL:", res.data.previewUrl);
-      setStep(2);
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Registration failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+      // 1. Create user in Firebase
+      const { createUserWithEmailAndPassword, sendEmailVerification } = await import("firebase/auth");
+      const { auth } = await import("@/lib/firebase");
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Optionally send verification email
+      try {
+        await sendEmailVerification(userCredential.user);
+        setMsg("Verification email sent! Please check your inbox.");
+      } catch (err) {
+        console.error("Failed to send verification email", err);
+      }
 
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      const res = await api.post("/auth/verify-otp", { email, otp });
+      // 2. Get Firebase ID token
+      const idToken = await userCredential.user.getIdToken();
+
+      // 3. Send token and user details to our backend to create MongoDB user and establish session
+      const res = await api.post("/auth/register-firebase", { 
+        name, mobile, address, idToken 
+      });
+      
+      // 4. Update local auth context with backend's JWT
       login(res.data.accessToken, res.data.user);
-      router.push("/dashboard");
+      
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 100);
     } catch (err: any) {
-      setError(err.response?.data?.message || "OTP Verification failed");
+      if (err.code?.startsWith('auth/')) {
+        setError(err.message || "Registration failed");
+      } else {
+        setError(err.response?.data?.message || "Registration failed on server");
+      }
     } finally {
       setLoading(false);
     }
@@ -71,7 +81,6 @@ export default function Register() {
         {error && <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">{error}</div>}
         {msg && <div className="mb-4 p-3 bg-indigo-500/20 border border-indigo-500/50 rounded-lg text-indigo-200 text-sm">{msg}</div>}
 
-        {step === 1 ? (
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-1">Full Name</label>
@@ -131,28 +140,6 @@ export default function Register() {
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign Up"}
             </button>
           </form>
-        ) : (
-          <form onSubmit={handleVerifyOTP} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-1">Enter 6-digit OTP</label>
-              <input 
-                type="text" 
-                required 
-                maxLength={6}
-                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors text-center text-xl tracking-[0.5em]"
-                value={otp}
-                onChange={e => setOtp(e.target.value)}
-              />
-            </div>
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center"
-            >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify Email"}
-            </button>
-          </form>
-        )}
 
         <div className="mt-6 text-center text-sm text-zinc-500">
           Already have an account? <Link href="/auth/login" className="text-indigo-400 hover:underline">Log in</Link>

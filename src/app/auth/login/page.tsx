@@ -22,14 +22,29 @@ export default function Login() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.post("/auth/login", { email, password });
+      // 1. Sign in with Firebase
+      const { signInWithEmailAndPassword } = await import("firebase/auth");
+      const { auth } = await import("@/lib/firebase");
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // 2. Get Firebase ID token
+      const idToken = await userCredential.user.getIdToken();
+
+      // 3. Send token to our backend to establish session
+      const res = await api.post("/auth/login-firebase", { idToken });
+      
+      // 4. Update local auth context with backend's JWT
       login(res.data.accessToken, res.data.user);
-      // Wait for a small delay to let React context update before redirecting
+      
       setTimeout(() => {
         router.push("/dashboard");
       }, 100);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
+      if (err.code?.startsWith('auth/')) {
+        setError(err.message || "Invalid credentials");
+      } else {
+        setError(err.response?.data?.message || "Login failed");
+      }
     } finally {
       setLoading(false);
     }
