@@ -25,6 +25,7 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setMsg("");
     try {
       // 1. Create user in Firebase
       const { createUserWithEmailAndPassword, sendEmailVerification } = await import("firebase/auth");
