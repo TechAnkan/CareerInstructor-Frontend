@@ -15,24 +15,37 @@ import api from "@/lib/api";
 const careerNodes = [
   // Engineering & Tech
   { id: 1, position: [0, 0, 0], title: "Software Engineering", color: "#6366f1", desc: "Build apps, systems, and platforms.", steps: ["Learn HTML, CSS, JavaScript", "Master React & Next.js", "Understand Node.js & Databases", "Build Full-Stack Projects", "Ace Algorithms & Data Structures"] },
-  { id: 2, position: [3, 2, -2], title: "Data Science", color: "#a855f7", desc: "Analyze data to find hidden patterns.", steps: ["Learn Python & SQL", "Master Statistics & Probability", "Learn Pandas & NumPy", "Machine Learning Basics", "Build Predictive Models"] },
+  { id: 2, position: [6, 4, -4], title: "Data Science", color: "#a855f7", desc: "Analyze data to find hidden patterns.", steps: ["Learn Python & SQL", "Master Statistics & Probability", "Learn Pandas & NumPy", "Machine Learning Basics", "Build Predictive Models"] },
+  { id: 22, position: [2, 6, -10], title: "Computer Applications (BCA/IT)", color: "#4f46e5", desc: "Software development and IT infrastructure.", steps: ["Complete 12th (Any Stream with Math)", "Enroll in BCA or B.Sc IT", "Learn Programming Languages", "Build Projects & Portfolios", "Pursue MCA or enter Tech Industry"] },
   
   // Medical & Healthcare
-  { id: 3, position: [5, -1, 3], title: "Medicine & Surgery", color: "#ef4444", desc: "Diagnose and treat patients as a doctor.", steps: ["Clear NEET/Medical Entrance", "Complete MBBS Degree", "1-Year Internship", "Pursue MD/MS Specialization", "Obtain Medical License"] },
-  { id: 4, position: [7, 1, 1], title: "Biotechnology", color: "#14b8a6", desc: "Merge biology with technology for innovation.", steps: ["Study Biology & Chemistry", "B.Sc/B.Tech in Biotech", "Learn Lab Techniques", "Master Bioinformatics", "Pursue R&D or Pharma Roles"] },
+  { id: 3, position: [10, -2, 6], title: "Medicine & Surgery", color: "#ef4444", desc: "Diagnose and treat patients as a doctor.", steps: ["Clear NEET/Medical Entrance", "Complete MBBS Degree", "1-Year Internship", "Pursue MD/MS Specialization", "Obtain Medical License"] },
+  { id: 4, position: [14, 2, 2], title: "Biotechnology", color: "#14b8a6", desc: "Merge biology with technology for innovation.", steps: ["Study Biology & Chemistry", "B.Sc/B.Tech in Biotech", "Learn Lab Techniques", "Master Bioinformatics", "Pursue R&D or Pharma Roles"] },
+  { id: 17, position: [16, -4, 4], title: "AYUSH (Ayurveda/Homeopathy)", color: "#84cc16", desc: "Traditional medicine systems like BAMS, BHMS, BUMS.", steps: ["Clear NEET-UG", "Enroll in BAMS/BHMS/BUMS", "Complete 5.5 Years Degree", "Finish 1-Year Internship", "Start Practice or pursue MD (Ayush)"] },
+  { id: 18, position: [12, -8, 2], title: "Allied Health Sciences", color: "#06b6d4", desc: "Specialized roles like Physiotherapy, Radiology, Lab Tech.", steps: ["Complete 12th Science (PCB)", "Enroll in B.Sc (Nursing/Radiology/PT)", "Gain Clinical Experience", "Obtain State License", "Work in Hospitals or Clinics"] },
+  { id: 19, position: [14, -6, -4], title: "Pharmacy", color: "#f43f5e", desc: "Medicine formulation, dispensing, and pharmacology.", steps: ["Complete 12th Science", "Enroll in B.Pharm/D.Pharm", "Learn Pharmacology & Chemistry", "Register with Pharmacy Council", "Work in Retail, Hospital, or R&D"] },
+  { id: 20, position: [10, -10, 6], title: "Nursing", color: "#fb7185", desc: "Vital patient care and medical assistance.", steps: ["Complete 12th Science", "Enroll in B.Sc Nursing", "Complete Clinical Rotations", "Register with Nursing Council", "Specialize or Work in Healthcare"] },
 
   // Commerce & Business
-  { id: 5, position: [-4, 3, 0], title: "Chartered Accountancy", color: "#10b981", desc: "Manage finances, auditing, and taxation.", steps: ["Clear CA Foundation", "Complete CA Intermediate", "3 Years Articleship", "Clear CA Final", "Register with ICAI"] },
-  { id: 6, position: [-6, 1, -2], title: "Investment Banking", color: "#059669", desc: "Help organizations raise capital and grow.", steps: ["Degree in Finance/Economics", "Learn Financial Modeling", "MBA from Top Tier College", "Intern at a Bank", "Network & Pass Licensing Exams"] },
+  { id: 5, position: [-8, 6, 0], title: "Chartered Accountancy", color: "#10b981", desc: "Manage finances, auditing, and taxation.", steps: ["Clear CA Foundation", "Complete CA Intermediate", "3 Years Articleship", "Clear CA Final", "Register with ICAI"] },
+  { id: 6, position: [-12, 2, -4], title: "Investment Banking", color: "#059669", desc: "Help organizations raise capital and grow.", steps: ["Degree in Finance/Economics", "Learn Financial Modeling", "MBA from Top Tier College", "Intern at a Bank", "Network & Pass Licensing Exams"] },
+  { id: 12, position: [-10, 8, -4], title: "BCom/BBA/BMS (Management)", color: "#10b981", desc: "Foundations of business, accounting, and management.", steps: ["Complete 12th Commerce", "Enroll in BCom/BBA/BMS", "Participate in Internships", "Develop Soft Skills", "Pursue MBA or Enter Corporate"] },
+  { id: 13, position: [-14, 4, 2], title: "Company Secretary (CS)", color: "#047857", desc: "Corporate governance and legal compliance expert.", steps: ["Register for CSEET", "Clear CS Executive", "Complete Articleship/Training", "Clear CS Professional", "Join a Corporate Board"] },
+  { id: 14, position: [-6, 10, 4], title: "Cost & Management Accountant (CMA)", color: "#34d399", desc: "Financial planning, analysis, and cost management.", steps: ["Enroll in CMA Foundation", "Clear CMA Intermediate", "Gain Practical Training", "Clear CMA Final", "Work in Financial Strategy"] },
 
-  // Arts & Humanities
-  { id: 7, position: [0, 4, 4], title: "Journalism", color: "#f97316", desc: "Investigate and report news to the public.", steps: ["Degree in Mass Communication", "Build Strong Writing Skills", "Start a Blog/Portfolio", "Intern at a News Agency", "Specialize in a Beat"] },
-  { id: 8, position: [2, 5, 2], title: "Psychology", color: "#db2777", desc: "Study the human mind and behavior.", steps: ["BA/B.Sc in Psychology", "MA/M.Sc Specialization", "Clear NET/Licensing", "Complete Clinical Internships", "Start Practice or Research"] },
-  { id: 9, position: [-5, -2, 3], title: "Law & Legal Studies", color: "#64748b", desc: "Advocate for justice and interpret laws.", steps: ["Clear CLAT/Law Entrance", "Complete LLB Degree", "Intern with a Senior Lawyer", "Pass Bar Council Exam", "Specialize in Corporate/Criminal Law"] },
+  // Arts, Humanities & Law
+  { id: 7, position: [0, 8, 8], title: "Journalism", color: "#f97316", desc: "Investigate and report news to the public.", steps: ["Degree in Mass Communication", "Build Strong Writing Skills", "Start a Blog/Portfolio", "Intern at a News Agency", "Specialize in a Beat"] },
+  { id: 8, position: [4, 10, 4], title: "Psychology", color: "#db2777", desc: "Study the human mind and behavior.", steps: ["BA/B.Sc in Psychology", "MA/M.Sc Specialization", "Clear NET/Licensing", "Complete Clinical Internships", "Start Practice or Research"] },
+  { id: 9, position: [-10, -4, 6], title: "Law & Legal Studies", color: "#64748b", desc: "Advocate for justice and interpret laws.", steps: ["Clear CLAT/Law Entrance", "Complete LLB Degree", "Intern with a Senior Lawyer", "Pass Bar Council Exam", "Specialize in Corporate/Criminal Law"] },
 
-  // Pure Sciences / Honors
-  { id: 10, position: [1, -5, -2], title: "Physics Research", color: "#0ea5e9", desc: "Uncover the fundamental laws of the universe.", steps: ["B.Sc Honors in Physics", "Master Calculus & Math", "M.Sc in Physics", "Qualify CSIR-NET/GATE", "Pursue Ph.D in specific field"] },
-  { id: 11, position: [-3, -4, -1], title: "Architecture", color: "#eab308", desc: "Design buildings and physical structures.", steps: ["Clear NATA/JEE Paper 2", "Complete B.Arch Degree", "Master AutoCAD & 3D Modeling", "Complete Mandatory Internship", "Register with Council of Architecture"] },
+  // Defense & Aviation
+  { id: 15, position: [0, 12, -6], title: "Aviation (Pilot)", color: "#38bdf8", desc: "Fly commercial or private aircraft globally.", steps: ["Clear Medical Class 2 & 1", "Join Flying School (SPL & PPL)", "Get Commercial Pilot License (CPL)", "Type Rating for Specific Aircraft", "Join an Airline"] },
+  { id: 16, position: [-4, 14, 0], title: "Defense Services (NDA)", color: "#166534", desc: "Serve the nation in Army, Navy, or Air Force.", steps: ["Clear NDA Written Exam", "Pass SSB Interview", "Clear Medical Tests", "3 Years at NDA Khadakwasla", "1 Year at respective Military Academy"] },
+
+  // Pure & Applied Sciences
+  { id: 10, position: [2, -10, -4], title: "Physics Research", color: "#0ea5e9", desc: "Uncover the fundamental laws of the universe.", steps: ["B.Sc Honors in Physics", "Master Calculus & Math", "M.Sc in Physics", "Qualify CSIR-NET/GATE", "Pursue Ph.D in specific field"] },
+  { id: 11, position: [-6, -8, -2], title: "Architecture", color: "#eab308", desc: "Design buildings and physical structures.", steps: ["Clear NATA/JEE Paper 2", "Complete B.Arch Degree", "Master AutoCAD & 3D Modeling", "Complete Mandatory Internship", "Register with Council of Architecture"] },
+  { id: 21, position: [6, 8, -8], title: "Forensic Science", color: "#9333ea", desc: "Apply science to criminal and civil laws.", steps: ["Complete 12th Science", "B.Sc in Forensic Science", "Learn Lab Techniques & DNA Profiling", "M.Sc Specialization", "Work in Crime Labs or Agencies"] },
 ];
 
 function CareerNode({ id, position, title, color, desc, onSelect }: any) {
@@ -268,7 +281,7 @@ export default function Explore() {
                 <X className="w-4 h-4" />
               </button>
 
-              <div className="p-8 relative z-10">
+              <div className="p-8 relative z-10 max-h-[85vh] overflow-y-auto">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-4 h-4 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.5)]" style={{ backgroundColor: selectedNode.color }} />
                   <h2 className="text-3xl font-bold text-white">{selectedNode.title}</h2>
@@ -388,7 +401,7 @@ export default function Explore() {
         <OrbitControls 
           enablePan={false} 
           minDistance={3} 
-          maxDistance={20}
+          maxDistance={40}
           autoRotate
           autoRotateSpeed={0.5}
         />
