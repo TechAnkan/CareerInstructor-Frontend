@@ -23,10 +23,17 @@ export default function Login() {
     setError("");
     try {
       // 1. Sign in with Firebase
-      const { signInWithEmailAndPassword } = await import("firebase/auth");
+      const { signInWithEmailAndPassword, signOut } = await import("firebase/auth");
       const { auth } = await import("@/lib/firebase");
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
+      if (!userCredential.user.emailVerified) {
+        await signOut(auth);
+        setError("Please verify your email before logging in. Check your inbox for the verification link.");
+        setLoading(false);
+        return;
+      }
+
       // 2. Get Firebase ID token
       const idToken = await userCredential.user.getIdToken();
 

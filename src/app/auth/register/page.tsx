@@ -21,21 +21,24 @@ export default function Register() {
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRegister = async (e?: React.FormEvent, isRetry = false) => {
+    if (e) e.preventDefault();
     setLoading(true);
-    setError("");
-    setMsg("");
+    if (!isRetry) {
+      setError("");
+      setMsg("");
+    }
+    
     try {
       // 1. Create user in Firebase
-      const { createUserWithEmailAndPassword, sendEmailVerification } = await import("firebase/auth");
+      const { createUserWithEmailAndPassword, sendEmailVerification, signOut } = await import("firebase/auth");
       const { auth } = await import("@/lib/firebase");
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
-      // Optionally send verification email
+      // Send verification email
       try {
         await sendEmailVerification(userCredential.user);
-        setMsg("Verification email sent! Please check your inbox.");
+        setMsg("Registration successful! Verification email sent. Please check your inbox and verify your email before logging in.");
       } catch (err) {
         console.error("Failed to send verification email", err);
       }
@@ -43,19 +46,28 @@ export default function Register() {
       // 2. Get Firebase ID token
       const idToken = await userCredential.user.getIdToken();
 
-      // 3. Send token and user details to our backend to create MongoDB user and establish session
-      const res = await api.post("/auth/register-firebase", { 
+      // 3. Send token and user details to our backend to create MongoDB user (isVerified: false)
+      await api.post("/auth/register-firebase", { 
         name, mobile, address, idToken 
       });
       
-      // 4. Update local auth context with backend's JWT
-      login(res.data.accessToken, res.data.user);
+      // 4. Sign out immediately. Do not log them in until they verify.
+      await signOut(auth);
       
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 100);
+      // Clear form
+      setName(""); setMobile(""); setAddress(""); setEmail(""); setPassword("");
+      
     } catch (err: any) {
-      if (err.code?.startsWith('auth/')) {
+      if (err.code === 'auth/email-already-in-use' && !isRetry) {
+        try {
+          // Attempt to clear unverified account occupying this email
+          await api.post("/auth/clear-unverified", { email });
+          // If successful, retry registration automatically
+          return handleRegister(undefined, true);
+        } catch (clearErr: any) {
+          setError(clearErr.response?.data?.message || "Email is already in use by a verified account.");
+        }
+      } else if (err.code?.startsWith('auth/')) {
         setError(err.message || "Registration failed");
       } else {
         setError(err.response?.data?.message || "Registration failed on server");
